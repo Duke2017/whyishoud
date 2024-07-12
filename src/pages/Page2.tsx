@@ -23,6 +23,10 @@ export const Page2 = () => {
     setPosition({ top: newTop, left: newLeft })
   }
 
+  const handleYesClick = () => {
+    setPosition({ top: '-100rem', left: '-100rem' })
+  }
+
   const onFinish = (values: sendValues) => {
     console.log("Success:", values)
     setSaved(true)
@@ -73,6 +77,7 @@ export const Page2 = () => {
                     left: position.left,
                   }}
                   onMouseEnter={handleMouseEnter}
+                  onClick={handleYesClick}
                 >
                   Да
                 </Radio>
@@ -99,7 +104,7 @@ export const Page2 = () => {
               <TextArea
                 rows={4}
                 placeholder={
-                  'Не шаблонный копипаст про знание HTML и CSS, а конкретные софт и хард скиллы, стек и прочее, чтобы не было "да, вы очень хорошо знаете React, но нам не нравится Ваш знак зодиака и цвет глаз" или "вы водили 9 лет КАМАЗ? извините, нам нужен водитель ЗИЛа"'
+                  'Не шаблонный копипаст про знание HTML и CSS, а конкретные софт и хард скиллы, стек и прочее, чтобы не было "да, вы очень хорошо знаете React, но нам не нравится Ваш знак зодиака и цвет глаз" или "Вы водили 9 лет КАМАЗ? извините, но нам нужен водитель ЗИЛа"'
                 }
               />
             </Form.Item>
