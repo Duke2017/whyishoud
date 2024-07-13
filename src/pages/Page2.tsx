@@ -1,5 +1,7 @@
 import { Flex, Typography, Button, Form, Input, Radio } from "antd"
 import { useState } from "react"
+import { initializeApp } from "firebase/app"
+import { addDoc, collection, getFirestore } from "firebase/firestore"
 
 const margin1 = { margin: "1rem" }
 const width100 = { width: "100%" }
@@ -7,10 +9,45 @@ const width100 = { width: "100%" }
 const { Title } = Typography
 const { TextArea } = Input
 
+// Вот даже не буду в .env прятать, если так нужно - держите)
+const firebaseConfig = {
+  apiKey: "AIzaSyD1pCTgKnkn5sf0gM_AGqY8YBRjyqwvJLI",
+  authDomain: "whyishoud.firebaseapp.com",
+  projectId: "whyishoud",
+  storageBucket: "whyishoud.appspot.com",
+  messagingSenderId: "343993143072",
+  appId: "1:343993143072:web:4946d27460fdce6ea91145",
+}
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig)
+const db = getFirestore(app)
+
 type sendValues = Record<
   "organization" | "salaryRange" | "requirements" | "contactInfo",
   string
 >
+
+async function writeUserData(obj: sendValues & { userIP: string }) {
+  try {
+    const docRef = await addDoc(collection(db, "records"), obj)
+
+    console.log("Document written with ID: ", docRef.id)
+  } catch (e) {
+    console.error("Error adding document: ", e)
+  }
+}
+
+let userIP = ""
+const getUserIPAddress = () => {
+  fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => {
+      userIP = data.ip.replace(/\./g, "")
+    })
+    .catch((error) => console.error("Error fetching user info:", error))
+}
+getUserIPAddress()
 
 export const Page2 = () => {
   const [form] = Form.useForm()
@@ -24,11 +61,18 @@ export const Page2 = () => {
   }
 
   const handleYesClick = () => {
-    setPosition({ top: '-100rem', left: '-100rem' })
+    setPosition({ top: "-100rem", left: "-100rem" })
   }
 
   const onFinish = (values: sendValues) => {
     console.log("Success:", values)
+    writeUserData({
+      userIP: userIP,
+      organization: values.organization,
+      salaryRange: values.salaryRange,
+      requirements: values.requirements,
+      contactInfo: values.contactInfo,
+    })
     setSaved(true)
   }
 
@@ -110,7 +154,7 @@ export const Page2 = () => {
             </Form.Item>
 
             <Form.Item
-              label="Ваши контактные данные для связи (в свободной форме)"
+              label="Ваши контактные данные для обратной связи (в свободной форме)"
               rules={[
                 {
                   required: true,
@@ -130,13 +174,21 @@ export const Page2 = () => {
           </Form>
         </Flex>
       ) : (
-        <Flex style={{...width100, ...{marginTop: '5rem'}}} vertical align="center" justify="center">
-           <Title level={5}>Большое спасибо за интерес, проявленный к кандидатуре разработчика.</Title>
+        <Flex
+          style={{ ...width100, ...{ marginTop: "5rem" } }}
+          vertical
+          align="center"
+          justify="center"
+        >
+          <Title level={5}>
+            Большое спасибо за интерес, проявленный к кандидатуре разработчика.
+          </Title>
           <Typography>
-            К сожалению, в настоящий момент вы не готовы чтобы он работал у вас на
-            данной вакансии.<br/>Мы внимательно ознакомились с вашей вакансией и,
-            возможно, вернемся к вашей компании, когда у нас возникнет такая
-            потребность.
+            К сожалению, в настоящий момент вы не готовы чтобы он работал у вас
+            на данной вакансии.
+            <br />
+            Мы внимательно ознакомились с вашей вакансией и, возможно, вернемся
+            к вашей компании, когда у нас возникнет такая потребность.
           </Typography>
         </Flex>
       )}
